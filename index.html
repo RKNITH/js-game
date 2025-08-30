@@ -1,0 +1,138 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS-GAME</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="splash-screen" class="splash" aria-label="Splash Screen">
+    </div>
+    <div class="logo-container">
+        <img class="logo" src="rating.png" alt="ESRB Rating">
+        <img class="logo" src="livearcde.png" alt="Xbox Live Arcade">
+        <img class="logo" src="msstudios.png" alt="Microsoft Studios">
+        <img class="logo" src="moajng.webp" alt="Mojang">
+        <img class="logo" src="4j.png" alt="4J Studios">
+    </div>
+
+    <div class="main-menu">
+        <div class="menu-content">
+            <!-- Use provided game logo; fallback to text if image missing -->
+            <div class="logo-wrap">
+                <img id="gameLogoImg" src="thegame.png" alt="THE GAME" class="game-logo"
+                    onload="document.getElementById('game-title-fallback').style.display='none'; this.style.display='block';"
+                    onerror="this.style.display='none'; document.getElementById('game-title-fallback').style.display='block';">
+                <span class="menu-tagline">Also try Minecraft!</span>
+                <h1 id="game-title-fallback" class="game-title" style="display:none">PLATFORM QUEST</h1>
+            </div>
+            <div class="menu-buttons">
+                <button id="start-btn" class="menu-btn primary">Play Game</button>
+                <button id="levels-btn" class="menu-btn">Levels</button>
+                <button id="achievements-btn" class="menu-btn">Achievements</button>
+                <button id="options-btn" class="menu-btn">Help &amp; Options</button>
+                <button id="store-btn" class="menu-btn">Minecraft Store</button>
+                <button id="exit-btn" class="menu-btn">Exit Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Levels modal -->
+    <div id="levels-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Select Level">
+        <div class="modal-panel">
+            <h2>Choose Level</h2>
+            <div id="levels-list" class="levels-list"></div>
+            <div class="modal-actions">
+                <button id="levels-close" class="menu-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    <!-- Options modal -->
+    <div id="options-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Options">
+        <div class="modal-panel">
+            <h2>Options</h2>
+            <label>Master Volume: <input id="opt-volume" type="range" min="0" max="1" step="0.01"></label>
+            <label>Mute SFX: <input id="opt-mute-sfx" type="checkbox"></label>
+            <label>Gamma: <input id="opt-gamma" type="range" min="0.5" max="1.5" step="0.01"></label>
+            <div class="modal-actions">
+                <button id="options-refresh-splash" class="menu-btn">Refresh Splash Text</button>
+                <button id="options-save" class="menu-btn primary">Save</button>
+                <button id="options-close" class="menu-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    <!-- Exit confirmation -->
+    <div id="exit-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Exit">
+        <div class="modal-panel">
+            <h2>Return to Title?</h2>
+            <div class="modal-actions">
+                <button id="exit-confirm" class="menu-btn primary">Yes</button>
+                <button id="exit-cancel" class="menu-btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements modal -->
+    <div id="achievements-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Achievements">
+        <div class="modal-panel">
+            <h2>Achievements</h2>
+            <div id="achievements-list" class="levels-list"></div>
+            <div class="modal-actions">
+                <button id="achievements-close" class="menu-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Section -->
+    <section id="game" class="game hidden" aria-label="Game Area">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+        <div id="hud" class="hud">
+            <span id="hud-level">Level 1</span>
+            <span id="hud-status" aria-live="polite"></span>
+            <span id="hud-coins">Coins 0/5</span>
+        </div>
+        <div id="hotbar"><img class="hotbar-icon" src="Ender_Pearl_JE3_BE2.webp" alt=""><span id="hotbar-count">0</span>
+        </div>
+        <div id="joystick" class="joystick-container" aria-hidden="true"></div>
+
+        <!-- Mobile controls: left/right, jump, pause -->
+        <div class="mobile-controls" aria-hidden="true">
+            <div class="mobile-left-right">
+                <button id="mobile-left" class="mobile-btn" aria-label="Move left">◀</button>
+                <button id="mobile-right" class="mobile-btn" aria-label="Move right">▶</button>
+            </div>
+            <div class="mobile-action">
+                <button id="mobile-jump" class="mobile-btn primary" aria-label="Jump">Jump</button>
+                <button id="mobile-pause" class="mobile-btn" aria-label="Pause">⏸</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pause overlay -->
+    <div id="pause-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Paused">
+        <div class="modal-panel" style="text-align:center;">
+            <img src="thegame.png" alt="THE GAME" class="game-logo" style="max-width:340px;margin-bottom:10px;">
+            <h2 style="margin-bottom:12px;">Paused</h2>
+            <div class="menu-buttons" style="width:360px;margin:0 auto;">
+                <button id="pause-resume" class="menu-btn primary">Resume</button>
+                <button id="pause-options" class="menu-btn">Options</button>
+                <button id="pause-exit" class="menu-btn">Exit to Title</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "nipplejs": "https://esm.sh/nipplejs@0.9.1"
+      }
+    }
+    </script>
+    <script src="script.js"></script>
+    <script type="module" src="game.js"></script>
+    <div id="achievement-toasts" aria-live="polite" aria-atomic="true"></div>
+</body>
+
+</html>

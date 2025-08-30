@@ -1,0 +1,515 @@
+@font-face {
+    font-family: 'Minecraft Seven';
+    src: url('Minecraft Seven_2.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: white;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Minecraft Seven', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    cursor: url('cursor(2).cur'), auto; /* custom cursor */
+}
+
+button, a, .menu-btn, canvas {
+    cursor: url('cursor(2).cur'), auto !important;
+}
+
+.logo-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    position: absolute;
+    max-width: 600px;
+    max-height: 450px;
+    width: auto;
+    height: auto;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.logo.active {
+    opacity: 1;
+}
+
+.game-logo {
+    max-width: 520px;
+    filter: drop-shadow(0 4px 0 rgba(0,0,0,0.4)) drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+    display: block;
+    margin: 0 auto 1rem auto;
+    image-rendering: crisp-edges;
+}
+
+.logo-wrap { position: relative; display: inline-block; }
+
+.main-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* use the provided panorama as a full-bleed background with subtle horizontal scroll */
+    background-image: url('360.jpg');
+    background-size: cover; /* scale to cover the viewport */
+    background-position: center center;
+    background-repeat: no-repeat;
+    /* subtle slow pan using transform on a pseudo element for better crispness */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: #111;
+    overflow: hidden;
+}
+
+/* create a subtle scrolling parallax layer */
+.main-menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* make a wide layer (200%) so we can slide it smoothly without visible snapping */
+    width: 200%;
+    height: 100%;
+    background-image: url('360.jpg');
+    background-size: cover;
+    background-position: left center;
+    background-repeat: repeat-x;
+    opacity: 0.95;
+    z-index: -1;
+    will-change: transform;
+    transform: translateX(0);
+    animation: menu-bg-scroll 40s linear infinite;
+    filter: brightness(var(--gamma-brightness, 1));
+}
+
+/* replace two-way pan with continuous horizontal scroll */
+@keyframes menu-bg-scroll {
+    /* slide leftwards so the visual result is the scene moving right;
+       using transform avoids background-position rounding/snapping issues */
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+
+.menu-tagline {
+    position: absolute;
+    right: -12px;
+    bottom: -12px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    transform: rotate(-8deg);
+    animation: tagline-pulse 1.2s ease-in-out infinite;
+    transform-origin: center center;
+    color: #ffd600;
+    text-shadow: 0 2px 0 #8a6b00;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+@keyframes tagline-pulse {
+    0%, 100% { transform: rotate(-8deg) scale(1); }
+    50%      { transform: rotate(-8deg) scale(1.12); }
+}
+
+.menu-content {
+    /* remove card look to match reference */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 1rem 0;
+    text-align: center;
+    color: #111;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 640px;
+    margin: 24px auto 0;
+}
+
+.menu-btn {
+    font-family: inherit;
+    font-size: 1.15rem;
+    padding: 1.05rem 1.2rem;
+    color: #eee;
+    background: linear-gradient(#9a9a9a, #7c7c7c);
+    border: 4px solid #111;
+    border-radius: 0;
+    box-shadow:
+        inset 0 1px 0 #cfcfcf,
+        inset 0 -3px 0 #5f5f5f,
+        0 8px 18px rgba(0,0,0,0.22);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    letter-spacing: 0.02em;
+    transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.12s ease, color 0.12s ease;
+    position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+.menu-btn::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0; height: 6px;
+    background: #2d6fff;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    border-top-left-radius: 0; border-top-right-radius: 0;
+}
+
+.menu-btn:hover {
+    transform: translateY(-1px);
+    color: #ffd600;
+    background: linear-gradient(#2d6fff, #1b4dd6);
+    box-shadow: inset 0 1px 0 #cfcfcf, inset 0 -2px 0 #5f5f5f, 0 10px 22px rgba(0,0,0,0.28);
+}
+
+.menu-btn:hover::before { opacity: 1; }
+
+.menu-btn.primary {
+    background: linear-gradient(#9d9d9d, #7e7e7e);
+    color: #eee;
+}
+
+.menu-btn.primary::before { opacity: 0; }
+
+.menu-btn.primary:hover {
+    transform: none;
+    background: linear-gradient(#2d6fff, #1b4dd6);
+    color: #ffd600;
+}
+
+.menu-btn.primary:hover::before { opacity: 1; }
+
+.menu-btn.locked{
+    background: linear-gradient(#4a4a4a, #313131);
+    color: #a8a8a8;
+    border-color: #000;
+    box-shadow: inset 0 1px 0 #5a5a5a, inset 0 -2px 0 #262626;
+    cursor: not-allowed;
+    filter: brightness(0.95);
+}
+.menu-btn.locked:hover{ transform:none; color:#a8a8a8; background:linear-gradient(#4a4a4a,#313131); }
+.level-entry.locked{ opacity:.75; }
+
+.game {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    display: none;
+    align-items: stretch;
+    justify-content: center;
+    background-image: url('dirt.png');
+    background-size: 320px;
+    background-repeat: repeat;
+}
+
+.game:not(.hidden) {
+    display: flex;
+}
+
+/* subtle darker HUD for cave levels (uses a class toggled on #game when playing cave levels) */
+.game.cave {
+    background: #0f0f0f;
+    background-image: none;
+}
+
+/* make cave canvas slightly darker overlay for atmosphere */
+.game.cave #gameCanvas {
+    filter: brightness(var(--gamma-brightness, 1));
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    display: block;
+    box-shadow: inset 0 0 0 6px rgba(0,0,0,0.06);
+    filter: brightness(var(--gamma-brightness, 1));
+}
+
+.hud {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    font-family: inherit;
+    color: #111;
+    background: rgba(255,255,255,0.95);
+    padding: 6px 10px;
+    border: 2px solid #111;
+}
+
+.hud span { margin-right: 8px; }
+
+.joystick-container {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 180px;
+    height: 180px;
+    touch-action: none;
+}
+
+/* Mobile on-screen controls */
+.mobile-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none; /* shown only on touch devices via JS */
+    gap: 10px;
+    align-items: center;
+    z-index: 1500;
+    pointer-events: auto;
+}
+.mobile-left-right {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.mobile-action {
+    display: flex;
+    gap: 8px;
+}
+.mobile-btn {
+    -webkit-tap-highlight-color: transparent;
+    background: rgba(255,255,255,0.92);
+    border: 3px solid #111;
+    color: #111;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    min-width: 56px;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+}
+.mobile-btn.primary {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+.mobile-btn:active {
+    transform: translateY(1px) scale(0.995);
+}
+
+/* Show mobile controls on small screens by default (JS will toggle for touch) */
+@media (max-width: 900px) {
+    .mobile-controls { display: flex; flex-direction: column; }
+}
+
+/* modal styles for levels/options/exit */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.45);
+    z-index: 2000;
+}
+.modal .modal-panel {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    min-width: 320px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #111;
+}
+.modal .levels-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0.6rem 0 1rem 0;
+    overflow-y: auto;
+    max-height: calc(85vh - 8rem);
+    padding-right: 6px;
+}
+.level-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal .modal-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    margin-top: 0.6rem;
+}
+.modal.hidden { display: none; }
+.modal:not(.hidden) { display: flex; }
+
+.splash {
+    position: fixed; inset: 0; background: #fff; display: flex;
+    justify-content: center; align-items: center; z-index: 2000;
+    background-image: url('splash.png'); background-size: cover; background-position: center; background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+#pause-modal {
+    background: rgba(0,0,0,0.6);
+}
+
+#achievement-toasts{
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    top: auto;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3000;
+    pointer-events: none;
+    align-items: center;
+}
+.achievement-toast{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 360px;
+    max-width: 560px;
+    padding: 12px 18px;
+    border-radius: 28px;
+    background: rgba(40,40,40,0.92);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    transform: translateY(10px);
+    opacity: 0;
+    animation: ach-in 280ms ease forwards;
+}
+.achievement-toast, .achievement-text{
+    font-family: "Segoe UI", "Noto Sans", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+.achievement-icon{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: conic-gradient(#9adf3b 0 90deg, #222 90deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    box-shadow: inset 0 0 0 3px #2b2b2b;
+}
+.achievement-icon span{
+    font-size: 20px;
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,.6));
+}
+.achievement-text strong{
+    display: block;
+    font-weight: 900;
+    margin-bottom: 2px;
+}
+.achievement-text small{
+    opacity: .9;
+}
+@keyframes ach-in{
+    to{transform: translateX(0); opacity: 1}
+}
+
+#hotbar{
+    position: fixed;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 72px;
+    background: url('Screenshot 2025-08-24 201522.png') center/cover no-repeat;
+    border: 2px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    gap: 0;
+    pointer-events: none;
+    z-index: 2500;
+}
+#hotbar .hotbar-icon{ width: 32px; height: 32px; image-rendering: pixelated; }
+#hotbar-count{
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    font-weight: 900;
+    font-size: 1rem;
+    color: #111;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.modal label{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+
+input[type="range"]{
+    appearance:none; -webkit-appearance:none;
+    height:14px; background:#e5e5e5; border:3px solid #111;
+    box-shadow: inset 0 1px 0 #fff, inset 0 -2px 0 #c9c9c9;
+    width: 240px; cursor: url('cursor(2).cur'), auto;
+}
+
+input[type="range"]::-webkit-slider-runnable-track{
+    height:14px; background:#e5e5e5; border:0;
+}
+input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:22px; height:22px; margin-top:-4px;
+    background:#9d9d9d; border:3px solid #111;
+    box-shadow: inset 0 1px 0 #cfcfcf, inset 0 -2px 0 #5f5f5f;
+    cursor: url('cursor(2).cur'), auto;
+}
+
+input[type="range"]::-moz-range-track{
+    height:14px; background:#e5e5e5; border:0;
+}
+input[type="range"]::-moz-range-thumb{
+    width:22px; height:22px;
+    background:#9d9d9d; border:3px solid #111;
+    box-shadow: inset 0 1px 0 #cfcfcf, inset 0 -2px 0 #5f5f5f;
+    cursor: url('cursor(2).cur'), auto;
+}
+
+input[type="range"]:focus{
+    outline:3px solid #2d6fff; outline-offset:2px;
+}
+
+input[type="checkbox"]{
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    width:22px; height:22px; border:3px solid #111; background:#fff;
+    box-shadow: inset 0 1px 0 #fff, inset 0 -2px 0 #c9c9c9;
+    cursor: url('cursor(2).cur'), auto; position:relative;
+}
+input[type="checkbox"]:focus{
+    outline:3px solid #2d6fff; outline-offset:2px;
+}
+
+input[type="checkbox"]:checked{
+    background:#2d6fff;
+}
+input[type="checkbox"]:checked::after{
+    content:""; position:absolute; left:3px; top:3px; right:3px; bottom:3px;
+    background:#ffd600; border:2px solid #111;
+}
